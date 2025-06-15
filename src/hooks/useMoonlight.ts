@@ -3,10 +3,13 @@ import { useEffect, useState } from 'react';
 export type MoonlightModule = {
     initializeStreamConfig: () => void;
     startConnection: (host: string, width: number, height: number, bitrate: number) => number;
+    startMainLoop: () => void; // 👈 añadido
 };
 
 interface MoonlightWindow extends Window {
-    createMoonlightModule: () => Promise<MoonlightModule>;
+    createMoonlightModule: (options?: {
+        locateFile?: (path: string) => string;
+    }) => Promise<MoonlightModule>;
 }
 
 export const useMoonlight = () => {
@@ -21,12 +24,16 @@ export const useMoonlight = () => {
 
             script.onload = async () => {
                 const createMoonlightModule = (window as unknown as MoonlightWindow).createMoonlightModule;
+
                 if (typeof createMoonlightModule === 'function') {
-                    const module = await createMoonlightModule();
+                    const module = await createMoonlightModule({
+                        locateFile: (path) => `/wasm/${path}`
+                    });
                     setMoonlight(module);
                 } else {
                     console.error('createMoonlightModule no está disponible en window');
                 }
+
                 setLoading(false);
             };
 

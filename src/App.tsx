@@ -10,14 +10,26 @@ function App() {
             return;
         }
 
-        // Puedes cambiar estos valores de prueba:
-        const host = '192.168.0.100';
+        const host = '192.168.1.152';
         const width = 1280;
         const height = 720;
         const bitrate = 8000;
 
-        const result = moonlight.startConnection(host, width, height, bitrate);
-        console.log('Resultado de startConnection:', result);
+        try {
+            // Inicializa parámetros de streaming
+            moonlight.initializeStreamConfig?.();
+
+            // Inicia conexión
+            const result = moonlight.startConnection(host, width, height, bitrate);
+            console.log('Resultado de startConnection:', result);
+
+            // Inicia loop principal en el siguiente ciclo del event loop
+            setTimeout(() => {
+                moonlight.startMainLoop();
+            }, 0);
+        } catch (error) {
+            console.error('Error al iniciar la conexión o el loop:', error);
+        }
     };
 
     return (
